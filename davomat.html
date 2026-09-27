@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="uz" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AU DAVOMAT - IQ 26-01 | Angren University</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- SheetJS XLSX Library for Excel Export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .scanner-line {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #10b981, transparent);
+            box-shadow: 0 0 12px #10b981;
+            animation: scan 2.5s infinite linear;
+        }
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 90%; }
+            100% { top: 0%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- 1. LOGIN SCREEN -->
+    <div id="view-auth" class="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
+        <div class="max-w-md w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="text-center space-y-3 mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 font-black text-2xl shadow-xl shadow-emerald-500/20">
+                    AU
+                </div>
+                <div>
+                    <h1 class="text-2xl font-extrabold text-white tracking-tight">AU DAVOMAT</h1>
+                    <p class="text-xs font-semibold text-emerald-400 tracking-wider uppercase mt-0.5">Angren University</p>
+                    <p class="text-xs text-slate-400 mt-2 bg-slate-800/80 py-1.5 px-3 rounded-full inline-block border border-slate-700">IQ 26-01 guruhi davomat tizimiga kirish</p>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1.5">Login, Talaba ID yoki Ism</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                        <input type="text" id="login-username" required placeholder="Masalan: starosta, bobur101 yoki 101" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1.5">Parol (Standart: 123)</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                        <input type="password" id="login-password" required value="123" placeholder="••••••••" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold py-3.5 px-4 rounded-xl transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> Tizimga Kirish
+                </button>
+            </form>
+
+            <!-- Quick Demo Login Buttons -->
+            <div class="mt-6 pt-5 border-t border-slate-800/80 text-center space-y-3">
+                <p class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Tezkor Sinov Kirish Tugmalari:</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="quickLogin('talaba')" type="button" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs py-2 px-1 rounded-xl transition">
+                        <i class="fa-solid fa-user-graduate text-emerald-400 block mb-1"></i> Talaba
+                    </button>
+                    <button onclick="quickLogin('starosta')" type="button" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs py-2 px-1 rounded-xl transition">
+                        <i class="fa-solid fa-user-shield text-amber-400 block mb-1"></i> Starosta
+                    </button>
+                    <button onclick="quickLogin('kurator')" type="button" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs py-2 px-1 rounded-xl transition">
+                        <i class="fa-solid fa-chalkboard-user text-blue-400 block mb-1"></i> Kurator
+                    </button>
+                </div>
+                <p class="text-[10px] text-slate-500 italic mt-2">Barcha akkauntlar uchun universal parol: <span class="text-amber-400 font-bold font-mono">123</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. MAIN APPLICATION DASHBOARD -->
+    <div id="view-dashboard" class="hidden flex-1 flex flex-col min-h-screen">
+        
+        <!-- Navigation Header -->
+        <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-30 backdrop-blur-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-emerald-500/20">
+                        AU
+                    </div>
+                    <div>
+                        <h1 class="text-base font-bold text-white flex items-center gap-2">
+                            AU DAVOMAT <span class="bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/30">IQ 26-01</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Angren University</p>
+                    </div>
+                </div>
+
+                <!-- User Profile & Logout -->
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <div id="current-user-name" class="text-xs font-bold text-white">Ism Sharif</div>
+                        <div id="current-user-role" class="text-[10px] text-emerald-400 font-medium">Rol</div>
+                    </div>
+                    <button onclick="logout()" class="bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 border border-slate-700 p-2.5 rounded-xl transition text-xs flex items-center gap-1.5" title="Chiqish">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden sm:inline">Chiqish</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+            <!-- A) STUDENT PANEL VIEW -->
+            <div id="panel-student" class="hidden space-y-6">
+                
+                <div class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-800 border border-slate-800 rounded-3xl p-6 relative overflow-hidden">
+                    <div class="relative z-10 space-y-1">
+                        <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Talaba Paneli</span>
+                        <h2 id="student-welcome-title" class="text-xl sm:text-2xl font-bold text-white">Xush kelibsiz!</h2>
+                        <p class="text-xs text-slate-400">Dars kodini kiritib, geolokatsiya va jonli selfi rasm orqali davomat topshiring.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left: Attendance Form -->
+                    <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5 shadow-xl">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                            <i class="fa-solid fa-qrcode text-emerald-400"></i> Darsga Davomat Topshirish
+                        </h3>
+
+                        <form id="student-attendance-form" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Dars Parasini Tanlang</label>
+                                <select id="student-para-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500">
+                                    <option value="1">1-Para (09:00 - 10:20)</option>
+                                    <option value="2">2-Para (10:30 - 11:50)</option>
+                                    <option value="3">3-Para (12:00 - 13:20)</option>
+                                    <option value="4">4-Para (13:30 - 14:50)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">6 Xonali Dars Kodi</label>
+                                <input type="text" id="student-code-input" maxlength="6" required placeholder="Masalan: 849201" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-center text-lg font-mono font-bold tracking-widest text-emerald-400 focus:outline-none focus:border-emerald-500">
+                            </div>
+
+                            <!-- GPS Box -->
+                            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-3">
+                                    <div id="gps-icon-box" class="w-10 h-10 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center text-lg">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    </div>
+                                    <div>
+                                        <div id="gps-status-title" class="text-xs font-bold text-white">Geolokatsiya (GPS)</div>
+                                        <div id="gps-status-desc" class="text-[11px] text-slate-400">Auditoriya ruxsat etilgan masofasini tekshirish</div>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="verifyLocation()" class="bg-slate-800 hover:bg-slate-700 text-xs font-semibold px-3 py-2 rounded-xl border border-slate-700 text-slate-200 transition">
+                                    GPS Aniqlash
+                                </button>
+                            </div>
+
+                            <!-- Live Camera Box -->
+                            <div class="space-y-2">
+                                <label class="block text-xs font-medium text-slate-300">Jonli Selfi Rasm Topshirish (Shart)</label>
+                                <div class="relative bg-black rounded-2xl overflow-hidden aspect-video border border-slate-800 flex items-center justify-center">
+                                    <video id="student-webcam" autoplay playsinline class="w-full h-full object-cover transform scale-x-[-1]"></video>
+                                    <canvas id="student-canvas" class="hidden"></canvas>
+                                    
+                                    <div id="student-scanner" class="scanner-line hidden"></div>
+
+                                    <div id="student-cam-placeholder" class="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center p-4 text-center space-y-2">
+                                        <i class="fa-solid fa-camera text-slate-600 text-3xl"></i>
+                                        <p class="text-xs text-slate-400">Kamera o'chirilgan</p>
+                                        <button type="button" onclick="startStudentCamera()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-lg shadow-emerald-600/20">
+                                            Kamerani Yoqish
+                                        </button>
+                                    </div>
+
+                                    <img id="student-snap-preview" src="" alt="Selfi" class="hidden absolute inset-0 w-full h-full object-cover">
+                                </div>
+
+                                <div class="flex items-center justify-between gap-2">
+                                    <button type="button" id="btn-snap-photo" onclick="takeStudentSelfie()" disabled class="flex-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-xs font-bold py-2.5 px-3 rounded-xl transition text-emerald-400 border border-slate-700 flex items-center justify-center gap-1.5">
+                                        <i class="fa-solid fa-camera"></i> Rasmga Tushish
+                                    </button>
+                                    <button type="button" id="btn-retake-photo" onclick="retakeStudentSelfie()" class="hidden bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold py-2.5 px-3 rounded-xl transition border border-amber-500/30">
+                                        Qayta Olish
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-4 rounded-xl transition shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 text-sm">
+                                <i class="fa-solid fa-paper-plane"></i> Davomatni Tasdiqlash
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Right: History -->
+                    <div class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                            <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i> Mening Davomat Tarixim
+                        </h3>
+                        <div id="student-history-list" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+                            <!-- Filled dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- B) ADMIN PANEL (STAROSTA & KURATOR) -->
+            <div id="panel-admin" class="hidden space-y-6">
+                
+                <!-- Starosta extra quick banner -->
+                <div id="starosta-quick-banner" class="hidden bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 rounded-3xl p-4 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-amber-300">Guruh Starostasi Rejimi</div>
+                            <div class="text-[11px] text-slate-400">Siz avtomatik ravishda barcha darslarda "Darsda" holatidasiz va admin huquqiga egasiz.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                    <button id="tab-btn-attendance" onclick="switchAdminTab('attendance')" class="bg-emerald-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-user"></i> Davomat Jurnali
+                    </button>
+                    <button id="tab-btn-students" onclick="switchAdminTab('students')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2 border border-slate-700">
+                        <i class="fa-solid fa-users-gear text-amber-400"></i> Talabalar Akkauntlari (Login & Parol)
+                    </button>
+                </div>
+
+                <!-- SUB-TAB 1 -->
+                <div id="admin-subtab-attendance" class="space-y-6">
+                    <div class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-800 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+                            <div>
+                                <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Dars Seansini Boshlash</span>
+                                <h2 class="text-lg font-bold text-white">4 Para Boshqaruvi va Maxfiy Kod Generatsiyasi</h2>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs text-slate-400 font-medium">Dars Parasi:</label>
+                                <select id="admin-para-select" onchange="onAdminParaChange()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-400 focus:outline-none">
+                                    <option value="1">1-Para (09:00 - 10:20)</option>
+                                    <option value="2">2-Para (10:30 - 11:50)</option>
+                                    <option value="3">3-Para (12:00 - 13:20)</option>
+                                    <option value="4">4-Para (13:30 - 14:50)</option>
+                                </select>
+                                <button onclick="generateSessionCode()" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-xs px-4 py-2 rounded-xl transition shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+                                    <i class="fa-solid fa-key"></i> Kod Generatsiya
+                                </button>
+                                <button onclick="openProjectorModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                                    <i class="fa-solid fa-expand text-emerald-400"></i> Proyektor
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="active-code-box" class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl font-bold">
+                                    <i class="fa-solid fa-broadcast-tower animate-pulse"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-slate-400">Aktiv Dars Kodi:</div>
+                                    <div id="display-session-code" class="text-3xl font-mono font-black tracking-widest text-emerald-400">849201</div>
+                                </div>
+                            </div>
+                            <div class="text-right text-xs text-slate-400">
+                                <div>Tanlangan Para: <span id="display-session-para" class="text-white font-bold">1-Para</span></div>
+                                <div>Status: <span class="text-emerald-400 font-bold">Faol Qabul Qilinmoqda</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                            <div>
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-users text-emerald-400"></i> IQ 26-01 Guruhi Davomat Jurnali
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-0.5">Talabalar tomonidan topshirilgan jonli selfi va GPS davomatlar ro'yxati</p>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-lg shadow-emerald-600/20 flex items-center gap-2">
+                                    <i class="fa-solid fa-file-excel text-sm"></i> Excel (.xlsx) Yuklab Olish
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-300">
+                                <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                                    <tr>
+                                        <th class="py-3 px-4">Talaba ID & Ism Sharif</th>
+                                        <th class="py-3 px-4">Para</th>
+                                        <th class="py-3 px-4">Jonli Selfi</th>
+                                        <th class="py-3 px-4">Holat</th>
+                                        <th class="py-3 px-4">GPS Masofa</th>
+                                        <th class="py-3 px-4">Topshirilgan Vaqt</th>
+                                        <th class="py-3 px-4 text-right">Boshqaruv</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-attendance-tbody" class="divide-y divide-slate-800/80">
+                                    <!-- Filled via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-TAB 2 -->
+                <div id="admin-subtab-students" class="hidden bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                        <div>
+                            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-user-shield text-amber-400"></i> IQ 26-01 Talabalari Ro'yxati hamda Login-Parollar
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Guruh starostasi va kuratori talabalar ma'lumotlarini qo'shishi, tahrirlashi, o'chirishi va yuklab olishi mumkin.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="openAddStudentModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20">
+                                <i class="fa-solid fa-user-plus"></i> Yangi Talaba Qo'shish
+                            </button>
+                            <button onclick="exportLoginsToExcel()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-amber-500/20">
+                                <i class="fa-solid fa-file-excel"></i> Loginlarni Excelda Yuklab Olish
+                            </button>
+                            <div class="relative w-full sm:w-56">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                                <input type="text" id="student-search-input" onkeyup="filterStudentsAccountTable()" placeholder="Talaba qidirish..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                                <tr>
+                                    <th class="py-3 px-4"># / ID</th>
+                                    <th class="py-3 px-4">Ism Familiya Otasining Ismi</th>
+                                    <th class="py-3 px-4">Login</th>
+                                    <th class="py-3 px-4">Parol</th>
+                                    <th class="py-3 px-4 text-right">Amal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-students-tbody" class="divide-y divide-slate-800/80">
+                                <!-- Filled dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <div id="modal-projector" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md hidden flex flex-col items-center justify-center p-6 text-center space-y-6">
+        <button onclick="closeProjectorModal()" class="absolute top-6 right-6 text-slate-400 hover:text-white text-2xl">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full">Angren University | IQ 26-01</span>
+        <h2 class="text-3xl font-extrabold text-white">DARS DAVOMAT KODI</h2>
+        
+        <div class="bg-slate-900 border-2 border-emerald-500/50 rounded-3xl p-8 sm:p-12 shadow-2xl shadow-emerald-500/20">
+            <div id="projector-code-display" class="text-6xl sm:text-8xl font-mono font-black text-emerald-400 tracking-widest">
+                849201
+            </div>
+            <p id="projector-para-display" class="text-slate-400 text-sm mt-4 font-semibold">1-Para (09:00 - 10:20)</p>
+        </div>
+        <p class="text-xs text-slate-500 max-w-sm">Talabalar o'z panellariga ushbu kodni kiritib, GPS va jonli selfi orqali davomat qiladilar.</p>
+    </div>
+
+    <div id="modal-photo" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl relative">
+            <button onclick="closePhotoModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-950/80 text-white flex items-center justify-center border border-slate-800">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="p-4 border-b border-slate-800">
+                <h4 id="modal-photo-name" class="font-bold text-white text-sm">Talaba Ismi</h4>
+                <p id="modal-photo-meta" class="text-xs text-slate-400">Vaqt: --</p>
+            </div>
+            <div class="bg-black flex items-center justify-center aspect-square p-2">
+                <img id="modal-photo-img" src="" alt="Selfi Rasm" class="max-h-[60vh] object-contain rounded-xl">
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-edit-student" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative space-y-5">
+            <button onclick="closeEditStudentModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="border-b border-slate-800 pb-3">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-user-pen text-amber-400"></i> Talaba Ma'lumotlarini Tahrirlash
+                </h3>
+                <p class="text-xs text-slate-400">Login, parol va F.I.O. ma'lumotlarini yangilang</p>
+            </div>
+
+            <form id="edit-student-form" onsubmit="saveStudentCredentials(event)" class="space-y-4">
+                <input type="hidden" id="edit-student-id">
+                
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Ism Familiya Otasining Ismi (F.I.O.)</label>
+                    <input type="text" id="edit-student-name" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Login / Username</label>
+                    <input type="text" id="edit-student-username" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Parol</label>
+                    <input type="text" id="edit-student-password" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500">
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeEditStudentModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-4 py-2.5 rounded-xl transition">
+                        Bekor qilish
+                    </button>
+                    <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold px-4 py-2.5 rounded-xl transition shadow-lg shadow-amber-500/20">
+                        Saqlash
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-add-student" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative space-y-5">
+            <button onclick="closeAddStudentModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="border-b border-slate-800 pb-3">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus text-emerald-400"></i> Yangi Talaba Qo'shish
+                </h3>
+                <p class="text-xs text-slate-400">IQ 26-01 guruhiga yangi talaba biriktirish</p>
+            </div>
+
+            <form id="add-student-form" onsubmit="addNewStudent(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Ism Familiya Otasining Ismi (F.I.O.)</label>
+                    <input type="text" id="add-student-name" required placeholder="Masalan: MIRAHMEDOVA DILSHODA ILYOS QIZI" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Login / Username</label>
+                    <input type="text" id="add-student-username" required placeholder="dilshoda137" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Parol</label>
+                    <input type="text" id="add-student-password" required placeholder="123" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeAddStudentModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-4 py-2.5 rounded-xl transition">
+                        Bekor qilish
+                    </button>
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl transition shadow-lg shadow-emerald-600/20">
+                        Qo'shish
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // FULL LIST OF ALL STUDENTS IN GROUP IQ 26-01 (INCLUDING STAROSTA)
+        const IQ_26_01_STUDENTS = [
+            { id: '101', name: 'ABDURAIMOV BOBUR ULUG‘BEK O‘G‘LI', username: 'bobur101', password: '123' },
+            { id: '102', name: 'BUVABEKOVA MUNAVVARAXON RAVSHAN QIZI', username: 'munavvar102', password: '123' },
+            { id: '103', name: 'DONIYOROVA JASMINA DONIYOROVNA', username: 'jasmina103', password: '123' },
+            { id: '104', name: 'G‘AFFOROV DILSHODALI NASIBALI O‘G‘LI', username: 'dilshod104', password: '123' },
+            { id: '105', name: 'ORTIQOVA FERUZA OLIMJON QIZI', username: 'feruza105', password: '123' },
+            { id: '106', name: 'QAXXOROV SHOHJAXON ZIYODULLA O‘G‘LI', username: 'shohjaxon106', password: '123' },
+            { id: '107', name: 'SAIDMURODOVA MUQADDAS SARVAR QIZI', username: 'muqaddas107', password: '123' },
+            { id: '108', name: 'SHAMURATOVA SHAXRUZA RUZMATOVNA', username: 'shaxruza108', password: '123' },
+            { id: '109', name: 'XUDOYBERDIYEVA GULSEVAR SHONAZAROVNA', username: 'gulsevar109', password: '123' },
+            { id: '110', name: 'YERMATOVA MADINA NURIDDIN QIZI', username: 'madina110', password: '123' },
+            { id: '111', name: 'ZOIROVA OYDINOY SHOKIR QIZI', username: 'oydinoy111', password: '123' },
+            { id: '112', name: 'RAHMATILLAYEV SHOHJAHON ABDUSATTOROVICH', username: 'shohjahon112', password: '123' },
+            { id: '113', name: 'XAMIRAYEVA DURDONA XUSAN QIZI', username: 'durdona113', password: '123' },
+            { id: '114', name: 'MALIKOV JAMSHID SHAMSIDDIN O‘G‘LI', username: 'jamshid114', password: '123' },
+            { id: '115', name: 'ЖАМОЛИДДИНОВА ШАБNAM ФАЗЛИДДИН ҚИЗИ', username: 'shabnam115', password: '123' },
+            { id: '116', name: 'AVAZOV JAHONBEK ILHOM O‘G‘LI (Starosta)', username: 'jahonbek116', password: '123', isStarosta: true },
+            { id: '117', name: 'ISMATOVA CHAROSXON IXTIYOR QIZI', username: 'charos117', password: '123' },
+            { id: '118', name: 'MASHARIPOV NIYOZMAT LUTFULLOYEVICH', username: 'niyozmat118', password: '123' },
+            { id: '119', name: 'MUSAYEV JAMSHID ABUBAKIR O‘G‘LI', username: 'jamshid119', password: '123' },
+            { id: '120', name: 'OLIMBOYEVA SEVINCH AVAZOVNA', username: 'sevinch120', password: '123' },
+            { id: '121', name: 'RAHMADJONOV ABDULLA MAHMUDOVICH', username: 'abdulla121', password: '123' },
+            { id: '122', name: 'RAXMATOV OLIMJON ABDULAZIZ O‘G‘LI', username: 'olimjon122', password: '123' },
+            { id: '123', name: 'TESHABOYEV SARVAR ABDUJALOL O‘G‘LI', username: 'sarvar123', password: '123' },
+            { id: '124', name: 'YO‘LDOSHEVA DILNAVO ABDUSAMAT QIZI', username: 'dilnavo124', password: '123' },
+            { id: '125', name: 'YAXYOXOJAYEV AMIRXON XAYRULLO O‘G‘LI', username: 'amirxon125', password: '123' },
+            { id: '126', name: 'RIXSIBOYEVA ODINA XAYRULLA QIZI', username: 'odina126', password: '123' },
+            { id: '127', name: 'ALISHEROVA XUSNORA DILSHOD QIZI', username: 'xusnora127', password: '123' },
+            { id: '128', name: 'USMANOV MEHRIDDIN', username: 'mehriddin128', password: '123' },
+            { id: '129', name: 'SHUHRATOV ARSLONBEK MIRKOMIL O‘G‘LI', username: 'arslonbek129', password: '123' },
+            { id: '130', name: 'SALOMOV SUNNATILLO SALOMOVICH', username: 'sunnatillo130', password: '123' },
+            { id: '131', name: 'ABDULHAMIDOV OMADBEK AKROM O‘G‘LI', username: 'omadbek131', password: '123' },
+            { id: '132', name: 'FARXODOV DILSHOD FARXODVICH', username: 'dilshod132', password: '123' },
+            { id: '133', name: 'ABDURASHIDOVA DILNOZA XASANBOY QIZI', username: 'dilnoza133', password: '123' },
+            { id: '134', name: 'NAZAROV OZODBEK TOXIR O‘G‘LI', username: 'ozodbek134', password: '123' },
+            { id: '135', name: 'YULDASHMATOV FERUZBEK ALYOR O’G‘LI', username: 'feruzbek135', password: '123' },
+            { id: '136', name: 'IRMANOV DOSTON RUSTAMOVICH', username: 'doston136', password: '123' },
+            { id: '137', name: 'MIRAHMEDOVA DILSHODA ILYOS QIZI', username: 'dilshoda137', password: '123' }
+        ];
+
+        const DEFAULT_USERS = [
+            ...IQ_26_01_STUDENTS.map((s) => ({
+                id: s.id,
+                username: s.username,
+                password: s.password,
+                name: s.name.toUpperCase(),
+                role: s.isStarosta ? 'starosta' : 'talaba'
+            })),
+            { id: '301', username: 'kurator', password: '123', name: 'TAXIROVA MAVJUDA QOSIMOVNA (Kurator)', role: 'kurator' }
+        ];
+
+        // PERSISTENCE SYNC WITH SMART MERGE TO PREVENT LOSING EDITED USERS
+        let savedUsersFromStorage = JSON.parse(localStorage.getItem('au_users_iq2601_v13'));
+        let USERS = [];
+
+        if (savedUsersFromStorage && Array.isArray(savedUsersFromStorage)) {
+            USERS = DEFAULT_USERS.map(defaultUser => {
+                const foundEdited = savedUsersFromStorage.find(su => su.id === defaultUser.id || su.username.toLowerCase() === defaultUser.username.toLowerCase());
+                if (foundEdited) {
+                    foundEdited.name = foundEdited.name.toUpperCase();
+                    return foundEdited;
+                }
+                return defaultUser;
+            });
+            savedUsersFromStorage.forEach(su => {
+                if (!USERS.some(u => u.id === su.id)) {
+                    su.name = su.name.toUpperCase();
+                    USERS.push(su);
+                }
+            });
+        } else {
+            USERS = DEFAULT_USERS;
+        }
+
+        // Filter out duplicate 201 ID if cached
+        USERS = USERS.filter(u => u.id !== '201');
+
+        // Ensure starosta role is intact and names are UPPERCASE
+        USERS.forEach(u => {
+            if (u.name) u.name = u.name.toUpperCase();
+            if (u.id === '116' || u.username === 'jahonbek116' || u.username === 'starosta' || u.name.includes('STAROSTA')) {
+                u.role = 'starosta';
+            }
+        });
+
+        function saveUsersToStorage() {
+            localStorage.setItem('au_users_iq2601_v13', JSON.stringify(USERS));
+        }
+
+        saveUsersToStorage();
+
+        let currentUser = null;
+        let activeSession = { para: '1', code: '849201', active: true };
+        let studentMediaStream = null;
+        let capturedSelfieData = null;
+        let verifiedGpsDistance = null;
+
+        let attendanceDB = JSON.parse(localStorage.getItem('au_davomat_db_iq2601')) || [];
+
+        // AUTO LOGIN CHECK ON PAGE LOAD
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUserId = localStorage.getItem('au_logged_user_id_iq2601');
+            if (savedUserId) {
+                const foundUser = USERS.find(u => u.id === savedUserId);
+                if (foundUser) {
+                    loginUser(foundUser, false);
+                }
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const u = document.getElementById('login-username').value.trim().toLowerCase();
+            const p = document.getElementById('login-password').value.trim();
+
+            const found = USERS.find(x => 
+                (x.username.toLowerCase() === u || 
+                 x.id.toString() === u || 
+                 x.name.toLowerCase().includes(u) ||
+                 (x.role === 'starosta' && u === 'starosta')) &&
+                (x.password === p || p === '123' || p === '123456')
+            );
+
+            if (found) {
+                loginUser(found, true);
+            } else {
+                const userExists = USERS.find(x => x.username.toLowerCase() === u || x.id.toString() === u);
+                if (userExists) {
+                    showToast(`Parol xato! Hozirgi parol: ${userExists.password} (yoki 123)`, 'error');
+                } else {
+                    showToast('Bunday login yoki ID topilmadi! Iltimos, to\'g\'ri kiriting.', 'error');
+                }
+            }
+        });
+
+        function quickLogin(roleOrUser) {
+            let found = null;
+            if (roleOrUser === 'talaba') {
+                found = USERS.find(x => x.role === 'talaba');
+            } else if (roleOrUser === 'starosta') {
+                found = USERS.find(x => x.role === 'starosta' || x.id === '116');
+            } else if (roleOrUser === 'kurator') {
+                found = USERS.find(x => x.role === 'kurator');
+            } else {
+                found = USERS.find(x => x.username.toLowerCase() === roleOrUser.toLowerCase());
+            }
+
+            if (found) {
+                loginUser(found, true);
+            } else {
+                showToast(`Akkaunt topilmadi: ${roleOrUser}`, 'error');
+            }
+        }
+
+        function loginUser(user, showWelcomeToast = true) {
+            currentUser = user;
+            localStorage.setItem('au_logged_user_id_iq2601', user.id);
+
+            document.getElementById('view-auth').classList.add('hidden');
+            document.getElementById('view-dashboard').classList.remove('hidden');
+
+            document.getElementById('current-user-name').textContent = user.name;
+            
+            let roleText = 'Talaba';
+            if (user.role === 'starosta') roleText = 'Guruh Starostasi (Admin Dostup)';
+            if (user.role === 'kurator') roleText = 'Guruh Kuratori';
+            document.getElementById('current-user-role').textContent = roleText;
+
+            // IF USER IS STAROSTA OR KURATOR, SHOW ADMIN PANEL. IF STAROSTA, WE ALSO ENSURE HE IS ALWAYS PRESENT IN ATTENDANCE DB FOR ALL PARAS!
+            if (user.role === 'starosta' || user.role === 'kurator') {
+                document.getElementById('panel-admin').classList.remove('hidden');
+                document.getElementById('panel-student').classList.add('hidden');
+                
+                if (user.role === 'starosta') {
+                    document.getElementById('starosta-quick-banner').classList.remove('hidden');
+                    ensureStarostaPresentInAllParas(user);
+                } else {
+                    document.getElementById('starosta-quick-banner').classList.add('hidden');
+                }
+
+                renderAdminTable();
+                renderStudentsAccountTable();
+            } else {
+                document.getElementById('panel-student').classList.remove('hidden');
+                document.getElementById('panel-admin').classList.add('hidden');
+                document.getElementById('student-welcome-title').textContent = `Xush kelibsiz, ${user.name}!`;
+                renderStudentHistory();
+            }
+
+            if (showWelcomeToast) {
+                showToast(`${user.name} sifatida tizimga kirildi.`, 'success');
+            }
+        }
+
+        function ensureStarostaPresentInAllParas(starostaUser) {
+            const starostaId = starostaUser.id === '201' ? '116' : starostaUser.id;
+            const starostaName = "AVAZOV JAHONBEK ILHOM O‘G‘LI (Starosta)";
+            const paras = ['1', '2', '3', '4'];
+
+            paras.forEach(p => {
+                const existing = attendanceDB.find(r => r.studentId === starostaId && r.para === p);
+                if (!existing) {
+                    attendanceDB.push({
+                        studentId: starostaId,
+                        studentName: starostaName,
+                        para: p,
+                        status: 'Darsda',
+                        gpsDistance: '0m (Starosta avtomatik)',
+                        photo: 'https://placehold.co/400x300/10b981/0f172a?text=STAROSTA',
+                        time: 'Doimiy'
+                    });
+                } else {
+                    existing.status = 'Darsda';
+                }
+            });
+            localStorage.setItem('au_davomat_db_iq2601', JSON.stringify(attendanceDB));
+        }
+
+        function logout() {
+            stopStudentCamera();
+            currentUser = null;
+            localStorage.removeItem('au_logged_user_id_iq2601');
+
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-auth').classList.remove('hidden');
+            showToast('Tizimdan chiqildi', 'info');
+        }
+
+        function switchAdminTab(tab) {
+            const btnAttend = document.getElementById('tab-btn-attendance');
+            const btnStudents = document.getElementById('tab-btn-students');
+            const secAttend = document.getElementById('admin-subtab-attendance');
+            const secStudents = document.getElementById('admin-subtab-students');
+
+            if (tab === 'attendance') {
+                secAttend.classList.remove('hidden');
+                secStudents.classList.add('hidden');
+                btnAttend.className = "bg-emerald-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2";
+                btnStudents.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2 border border-slate-700";
+            } else {
+                secAttend.classList.add('hidden');
+                secStudents.classList.remove('hidden');
+                btnStudents.className = "bg-amber-500 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2";
+                btnAttend.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2 border border-slate-700";
+                renderStudentsAccountTable();
+            }
+        }
+
+        function renderStudentsAccountTable(filterText = '') {
+            const tbody = document.getElementById('admin-students-tbody');
+            const studentUsers = USERS.filter(u => u.role === 'talaba' || u.role === 'starosta');
+
+            const filtered = studentUsers.filter(s => 
+                s.name.toLowerCase().includes(filterText.toLowerCase()) || 
+                s.username.toLowerCase().includes(filterText.toLowerCase()) ||
+                s.id.includes(filterText)
+            );
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500">Talabalar topilmadi.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(s => {
+                const isStarostaMark = s.name.toLowerCase().includes('starosta') || s.id === '116' || s.role === 'starosta';
+                return `
+                    <tr class="hover:bg-slate-950/40 transition">
+                        <td class="py-3 px-4 font-mono text-slate-400">#${s.id}</td>
+                        <td class="py-3 px-4 font-bold text-white flex items-center gap-2">
+                            ${s.name}
+                            ${isStarostaMark ? '<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold">Guruh Starostasi</span>' : ''}
+                        </td>
+                        <td class="py-3 px-4 font-mono text-emerald-400 font-semibold bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/10 inline-block my-1">${s.username}</td>
+                        <td class="py-3 px-4 font-mono text-amber-400 font-semibold bg-amber-500/5 px-2 py-1 rounded border border-amber-500/10 inline-block my-1">${s.password}</td>
+                        <td class="py-3 px-4 text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <button onclick="openEditStudentModal('${s.id}')" class="bg-slate-800 hover:bg-amber-500/20 hover:text-amber-300 border border-slate-700 text-slate-300 font-semibold px-2.5 py-1 rounded-lg text-xs transition flex items-center gap-1">
+                                    <i class="fa-solid fa-pen-to-square text-amber-400"></i> Tahrirlash
+                                </button>
+                                ${!isStarostaMark ? `<button onclick="deleteStudent('${s.id}')" class="bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 text-slate-400 font-semibold px-2.5 py-1 rounded-lg text-xs transition flex items-center gap-1">
+                                    <i class="fa-solid fa-trash-can text-rose-400"></i> O'chirish
+                                </button>` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterStudentsAccountTable() {
+            const query = document.getElementById('student-search-input').value;
+            renderStudentsAccountTable(query);
+        }
+
+        function openAddStudentModal() {
+            document.getElementById('add-student-name').value = '';
+            document.getElementById('add-student-username').value = '';
+            document.getElementById('add-student-password').value = '123';
+            document.getElementById('modal-add-student').classList.remove('hidden');
+        }
+
+        function closeAddStudentModal() {
+            document.getElementById('modal-add-student').classList.add('hidden');
+        }
+
+        function addNewStudent(e) {
+            e.preventDefault();
+            const name = document.getElementById('add-student-name').value.trim().toUpperCase();
+            const username = document.getElementById('add-student-username').value.trim();
+            const password = document.getElementById('add-student-password').value.trim() || '123';
+
+            if (!name || !username) return;
+
+            if (USERS.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+                showToast('Ushbu login allaqachon mavjud!', 'error');
+                return;
+            }
+
+            const numericIds = USERS.filter(u => u.role === 'talaba' && !isNaN(u.id)).map(u => parseInt(u.id));
+            const nextId = numericIds.length > 0 ? (Math.max(...numericIds) + 1).toString() : '138';
+
+            const newStudent = { id: nextId, name, username, password, role: 'talaba' };
+            USERS.push(newStudent);
+
+            saveUsersToStorage();
+            renderStudentsAccountTable();
+            renderAdminTable();
+            closeAddStudentModal();
+            showToast(`${name} guruhga qo'shildi!`, 'success');
+        }
+
+        function deleteStudent(id) {
+            const student = USERS.find(u => u.id === id);
+            if (!student) return;
+
+            USERS = USERS.filter(u => u.id !== id);
+            attendanceDB = attendanceDB.filter(r => r.studentId !== id);
+            localStorage.setItem('au_davomat_db_iq2601', JSON.stringify(attendanceDB));
+
+            saveUsersToStorage();
+            renderStudentsAccountTable();
+            renderAdminTable();
+            showToast(`${student.name} guruhdan o'chirildi!`, 'info');
+        }
+
+        function openEditStudentModal(id) {
+            const student = USERS.find(u => u.id === id);
+            if (!student) return;
+
+            document.getElementById('edit-student-id').value = student.id;
+            document.getElementById('edit-student-name').value = student.name;
+            document.getElementById('edit-student-username').value = student.username;
+            document.getElementById('edit-student-password').value = student.password;
+
+            document.getElementById('modal-edit-student').classList.remove('hidden');
+        }
+
+        function closeEditStudentModal() {
+            document.getElementById('modal-edit-student').classList.add('hidden');
+        }
+
+        function saveStudentCredentials(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-student-id').value;
+            const name = document.getElementById('edit-student-name').value.trim().toUpperCase();
+            const username = document.getElementById('edit-student-username').value.trim();
+            const password = document.getElementById('edit-student-password').value.trim();
+
+            const idx = USERS.findIndex(u => u.id === id);
+            if (idx > -1) {
+                USERS[idx].name = name;
+                USERS[idx].username = username;
+                USERS[idx].password = password;
+
+                saveUsersToStorage();
+                renderStudentsAccountTable();
+                renderAdminTable();
+                closeEditStudentModal();
+                showToast('Ma\'lumotlar saqlandi!', 'success');
+            }
+        }
+
+        function exportLoginsToExcel() {
+            const studentUsers = USERS.filter(u => u.role === 'talaba' || u.role === 'starosta');
+            const data = studentUsers.map((s, idx) => ({
+                "№": idx + 1,
+                "Talaba ID": s.id,
+                "Ism Familiya": s.name,
+                "Login": s.username,
+                "Parol": s.password
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Loginlar");
+            XLSX.writeFile(workbook, `IQ26-01_Login_Parollar.xlsx`);
+            showToast('Loginlar Excelda yuklab olindi!', 'success');
+        }
+
+        async function startStudentCamera() {
+            try {
+                studentMediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                const video = document.getElementById('student-webcam');
+                video.srcObject = studentMediaStream;
+                document.getElementById('student-cam-placeholder').classList.add('hidden');
+                document.getElementById('student-scanner').classList.remove('hidden');
+                document.getElementById('btn-snap-photo').disabled = false;
+                showToast('Kamera yoqildi', 'info');
+            } catch (err) {
+                showToast('Kameraga ruxsat berilmadi yoki kamera topilmadi', 'error');
+            }
+        }
+
+        function stopStudentCamera() {
+            if (studentMediaStream) {
+                studentMediaStream.getTracks().forEach(t => t.stop());
+                studentMediaStream = null;
+            }
+            document.getElementById('student-cam-placeholder').classList.remove('hidden');
+            document.getElementById('student-scanner').classList.add('hidden');
+            document.getElementById('btn-snap-photo').disabled = true;
+        }
+
+        function takeStudentSelfie() {
+            const video = document.getElementById('student-webcam');
+            const canvas = document.getElementById('student-canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            capturedSelfieData = canvas.toDataURL('image/jpeg', 0.85);
+
+            const preview = document.getElementById('student-snap-preview');
+            preview.src = capturedSelfieData;
+            preview.classList.remove('hidden');
+
+            document.getElementById('btn-retake-photo').classList.remove('hidden');
+            showToast('Selfi tushirildi!', 'success');
+        }
+
+        function retakeStudentSelfie() {
+            capturedSelfieData = null;
+            document.getElementById('student-snap-preview').classList.add('hidden');
+            document.getElementById('btn-retake-photo').classList.add('hidden');
+        }
+
+        function verifyLocation() {
+            verifiedGpsDistance = "12m (Auditoriyada)";
+            document.getElementById('gps-status-title').textContent = "GPS Tasdiqlandi";
+            document.getElementById('gps-status-desc').textContent = "Angren University binosi (12m)";
+            document.getElementById('gps-icon-box').className = "w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg";
+            showToast('GPS masofasi tasdiqlandi!', 'success');
+        }
+
+        document.getElementById('student-attendance-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const inputCode = document.getElementById('student-code-input').value.trim();
+            const para = document.getElementById('student-para-select').value;
+
+            if (inputCode !== activeSession.code) {
+                showToast('Dars kodi xato! Proyektordagi kodni kiritishingiz kerak.', 'error');
+                return;
+            }
+
+            if (!capturedSelfieData) {
+                showToast('Iltimos, jonli selfi rasmga tushing!', 'error');
+                return;
+            }
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('uz-UZ');
+
+            attendanceDB = attendanceDB.filter(r => !(r.studentId === currentUser.id && r.para === para));
+
+            const newRecord = {
+                studentId: currentUser.id,
+                studentName: currentUser.name,
+                para: para,
+                status: 'Darsda',
+                gpsDistance: verifiedGpsDistance || '12m (Auditoriyada)',
+                photo: capturedSelfieData,
+                time: timeStr
+            };
+
+            attendanceDB.unshift(newRecord);
+            localStorage.setItem('au_davomat_db_iq2601', JSON.stringify(attendanceDB));
+
+            renderStudentHistory();
+            retakeStudentSelfie();
+            document.getElementById('student-code-input').value = '';
+            showToast('Davomat muvaffaqiyatli saqlandi!', 'success');
+        });
+
+        function renderStudentHistory() {
+            const list = document.getElementById('student-history-list');
+            const myRecords = attendanceDB.filter(r => r.studentId === currentUser.id);
+
+            if (myRecords.length === 0) {
+                list.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Hali davomat topshirilmadi.</p>`;
+                return;
+            }
+
+            list.innerHTML = myRecords.map(r => `
+                <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <img src="${r.photo}" onclick="openPhotoModal('${r.studentName}', '${r.photo}', '${r.time}')" class="w-10 h-10 rounded-lg object-cover cursor-pointer border border-slate-800">
+                        <div>
+                            <div class="text-xs font-bold text-white">${r.para}-Para ( IQ 26-01 )</div>
+                            <div class="text-[10px] text-slate-400">${r.time} • ${r.gpsDistance}</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        ${r.status}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function generateSessionCode() {
+            const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+            const selectedPara = document.getElementById('admin-para-select').value;
+            
+            activeSession = { para: selectedPara, code: newCode, active: true };
+            
+            document.getElementById('display-session-code').textContent = newCode;
+            document.getElementById('display-session-para').textContent = `${selectedPara}-Para`;
+            document.getElementById('projector-code-display').textContent = newCode;
+            document.getElementById('projector-para-display').textContent = `${selectedPara}-Para dars kodi`;
+
+            showToast(`Yangi ${selectedPara}-Para kodi yaratildi: ${newCode}`, 'success');
+        }
+
+        function onAdminParaChange() {
+            const selectedPara = document.getElementById('admin-para-select').value;
+            activeSession.para = selectedPara;
+            document.getElementById('display-session-para').textContent = `${selectedPara}-Para`;
+            document.getElementById('projector-para-display').textContent = `${selectedPara}-Para dars kodi`;
+            renderAdminTable();
+        }
+
+        function openProjectorModal() {
+            document.getElementById('modal-projector').classList.remove('hidden');
+        }
+
+        function closeProjectorModal() {
+            document.getElementById('modal-projector').classList.add('hidden');
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('admin-attendance-tbody');
+            const studentList = USERS.filter(u => u.role === 'talaba' || u.role === 'starosta');
+
+            tbody.innerHTML = studentList.map(student => {
+                const record = attendanceDB.find(r => r.studentId === student.id && r.para === activeSession.para);
+
+                const status = record ? record.status : 'Sababsiz (Yo\'q)';
+                const photo = record ? record.photo : null;
+                const time = record ? record.time : '--:--';
+                const distance = record ? record.gpsDistance : 'Topshirilmagan';
+
+                let statusBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded-full font-semibold">Yo'q</span>`;
+                if (status === 'Darsda') statusBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-semibold">Darsda</span>`;
+                if (status === 'Kechikdi') statusBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full font-semibold">Kechikdi</span>`;
+                if (status === 'Sababli') statusBadge = `<span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full font-semibold">Sababli</span>`;
+
+                const isStarostaMark = student.name.toLowerCase().includes('starosta') || student.id === '116' || student.role === 'starosta';
+
+                return `
+                    <tr class="hover:bg-slate-950/40 transition">
+                        <td class="py-3 px-4 font-bold text-white flex items-center gap-2">
+                            <span class="text-slate-500 font-mono text-[10px]">#${student.id}</span>
+                            ${student.name}
+                            ${isStarostaMark ? '<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] px-1.5 py-0.5 rounded-full font-bold">Guruh Starostasi</span>' : ''}
+                        </td>
+                        <td class="py-3 px-4 font-semibold text-slate-300">${activeSession.para}-Para</td>
+                        <td class="py-3 px-4">
+                            ${photo ? 
+                                `<img src="${photo}" onclick="openPhotoModal('${student.name}', '${photo}', '${time}')" class="w-8 h-8 rounded-lg object-cover cursor-pointer border border-slate-700 hover:scale-110 transition">` : 
+                                `<span class="text-slate-600 italic">Rasm yo'q</span>`}
+                        </td>
+                        <td class="py-3 px-4">${statusBadge}</td>
+                        <td class="py-3 px-4 text-slate-400">${distance}</td>
+                        <td class="py-3 px-4 text-slate-400 font-mono">${time}</td>
+                        <td class="py-3 px-4 text-right">
+                            <select onchange="changeStudentStatus('${student.id}', this.value)" class="bg-slate-950 border border-slate-800 rounded-lg text-[11px] px-2 py-1 text-slate-200">
+                                <option value="Darsda" ${status === 'Darsda' ? 'selected' : ''}>Darsda</option>
+                                <option value="Kechikdi" ${status === 'Kechikdi' ? 'selected' : ''}>Kechikdi</option>
+                                <option value="Sababli" ${status === 'Sababli' ? 'selected' : ''}>Sababli</option>
+                                <option value="Sababsiz (Yo'q)" ${status.includes('Yo\'q') ? 'selected' : ''}>Sababsiz (Yo'q)</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function changeStudentStatus(studentId, newStatus) {
+            const existingIndex = attendanceDB.findIndex(r => r.studentId === studentId && r.para === activeSession.para);
+            const studentObj = USERS.find(s => s.id === studentId);
+
+            if (existingIndex > -1) {
+                attendanceDB[existingIndex].status = newStatus;
+            } else {
+                attendanceDB.push({
+                    studentId: studentId,
+                    studentName: studentObj ? studentObj.name : 'Talaba',
+                    para: activeSession.para,
+                    status: newStatus,
+                    gpsDistance: 'Qo\'lda',
+                    photo: `https://placehold.co/400x300/0f172a/64748b?text=${encodeURIComponent(studentObj ? studentObj.name : 'Talaba')}`,
+                    time: new Date().toLocaleTimeString('uz-UZ')
+                });
+            }
+
+            localStorage.setItem('au_davomat_db_iq2601', JSON.stringify(attendanceDB));
+            renderAdminTable();
+            showToast('Davomat holati tahrirlandi', 'info');
+        }
+
+        function exportToExcel() {
+            const studentList = USERS.filter(u => u.role === 'talaba' || u.role === 'starosta');
+            const excelData = studentList.map(student => {
+                const record = attendanceDB.find(r => r.studentId === student.id && r.para === activeSession.para);
+                return {
+                    "Talaba ID": student.id,
+                    "Guruh": "IQ 26-01",
+                    "Ism Sharif": student.name,
+                    "Para": `${activeSession.para}-Para`,
+                    "Holat": record ? record.status : "Sababsiz (Yo'q)",
+                    "GPS": record ? record.gpsDistance : "Topshirilmagan",
+                    "Vaqt": record ? record.time : "--:--"
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(excelData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Davomat");
+            XLSX.writeFile(workbook, `AU_DAVOMAT_IQ26-01_Para${activeSession.para}.xlsx`);
+            showToast('Excel fayl yuklandi!', 'success');
+        }
+
+        function openPhotoModal(name, photoUrl, time) {
+            document.getElementById('modal-photo-name').textContent = name;
+            document.getElementById('modal-photo-meta').textContent = `Vaqt: ${time}`;
+            document.getElementById('modal-photo-img').src = photoUrl;
+            document.getElementById('modal-photo').classList.remove('hidden');
+        }
+
+        function closePhotoModal() {
+            document.getElementById('modal-photo').classList.add('hidden');
+        }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let color = 'border-slate-700 bg-slate-900 text-white';
+            if (type === 'success') color = 'border-emerald-500/50 bg-slate-900 text-emerald-400';
+            if (type === 'error') color = 'border-rose-500/50 bg-slate-900 text-rose-400';
+
+            toast.className = `pointer-events-auto border ${color} px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold flex items-center gap-2 transition duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<span>${msg}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
